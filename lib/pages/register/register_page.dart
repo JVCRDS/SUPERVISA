@@ -14,6 +14,8 @@ class RegisterPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Criar Conta'),
         centerTitle: true,
+        backgroundColor: Colors.transparent, // AppBar transparente
+        elevation: 0, // Remove sombra
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -29,7 +31,7 @@ class RegisterPage extends StatelessWidget {
                 const Icon(
                   Icons.person_add,
                   size: 80,
-                  color: Colors.green,
+                  color: Color.fromARGB(255, 39, 87, 119),
                 ),
                 const SizedBox(height: 20),
                 const Text(

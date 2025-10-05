@@ -7,16 +7,16 @@ class AboutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'SUPERVISA',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+        title: Image.asset(
+          'assets/icons/Supervisa_Logo.png', // Usei o que existe na lista
+          height: 300,
+          width: 1000,
+          fit: BoxFit.contain,
         ),
-        centerTitle: true,
-        backgroundColor: Colors.blue[800],
+        centerTitle: false,
+        titleSpacing: 0,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -27,15 +27,6 @@ class AboutPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Título principal
-            Text(
-              'SUPERVISA',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue[800],
-              ),
-            ),
             const SizedBox(height: 8),
             
             // Linha divisória
@@ -46,14 +37,24 @@ class AboutPage extends StatelessWidget {
             ),
             const SizedBox(height: 30),
 
-            // Subtítulo
-            Text(
-              'Sobre o aplicativo',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
-              ),
+            // Subtítulo com ícone
+            Row(
+              children: [
+                Image.asset(
+                  'assets/icons/Icon_Sobre.png', // Esse existe na lista
+                  width: 28,
+                  height: 28,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Sobre o aplicativo',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
 
@@ -80,16 +81,26 @@ class AboutPage extends StatelessWidget {
             ),
             const SizedBox(height: 30),
 
-            // Versão
+            // Versão com ícone
             Center(
-              child: Text(
-                'v0.0.1',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                  fontStyle: FontStyle.italic,
-                ),
+              child: Column(
+                children: [
+                  Image.asset(
+                    'assets/icons/Supervisa_Icon.png', // Usei o que existe
+                    width: 50,
+                    height: 50,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'v0.0.1',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[600],
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 20),
@@ -98,14 +109,26 @@ class AboutPage extends StatelessWidget {
             const Divider(color: Colors.grey),
             const SizedBox(height: 10),
 
+            // Slogan com ícone da cidade
             Center(
-              child: Text(
-                'Suporte para Vigilância em Saúde',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.green[700],
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/icons/Icon_Cidade.png', // Esse existe
+                    width: 24,
+                    height: 24,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Suporte para Vigilância em Saúde',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.green[700],
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 40),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/pages/about/about_page.dart';
 import 'package:flutter_application_1/pages/login/login_page.dart';
-
+import 'package:flutter_application_1/pages/chat/chat_page.dart';
 
 class MainMenuPage extends StatelessWidget {
   const MainMenuPage({super.key});
@@ -11,17 +11,16 @@ class MainMenuPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'SUPERVISA',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+        title: Image.asset(
+          'assets/icons/Supervisa_Logo.png',
+          height: 300, // Tamanho grande padronizado
+          width: 1000, // Tamanho grande padronizado
+          fit: BoxFit.contain,
         ),
-        centerTitle: true,
-        backgroundColor: Colors.blue[800],
+        centerTitle: true, // Centralizado (sem botão voltar)
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        // Sem leading (não tem botão de voltar)
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -54,13 +53,10 @@ class MainMenuPage extends StatelessWidget {
                         color: Colors.blue[100],
                         shape: BoxShape.circle,
                       ),
-                      child: Text(
-                        '1',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue[800],
-                        ),
+                      child: Image.asset(
+                        'assets/icons/Icon_Sobre.png',
+                        width: 24,
+                        height: 24,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -83,6 +79,8 @@ class MainMenuPage extends StatelessWidget {
                               fontSize: 14,
                               color: Colors.grey[600],
                             ),
+                            maxLines: 1, // Evita quebra de linha
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
@@ -102,11 +100,11 @@ class MainMenuPage extends StatelessWidget {
             // Botão 2: Falar com o Assistente
             ElevatedButton(
               onPressed: () {
-                // Navegar para tela do chat
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatPage()));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                foregroundColor: Colors.green[800],
+                foregroundColor: Colors.blue[800],
                 elevation: 4,
                 padding: const EdgeInsets.all(20),
                 shape: RoundedRectangleBorder(
@@ -120,16 +118,13 @@ class MainMenuPage extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.green[100],
+                        color: Colors.blue[100],
                         shape: BoxShape.circle,
                       ),
-                      child: Text(
-                        '2',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green[800],
-                        ),
+                      child: Image.asset(
+                        'assets/icons/Chat_icon.png',
+                        width: 24,
+                        height: 24,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -138,12 +133,14 @@ class MainMenuPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Falar com o Assistente',
+                            'Falar com Assistente',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.green[800],
+                              color: Colors.blue[800],
                             ),
+                            maxLines: 1, // Evita quebra de linha
+                            overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -152,13 +149,15 @@ class MainMenuPage extends StatelessWidget {
                               fontSize: 14,
                               color: Colors.grey[600],
                             ),
+                            maxLines: 1, // Evita quebra de linha
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
                     ),
                     Icon(
                       Icons.arrow_forward_ios,
-                      color: Colors.green[800],
+                      color: Colors.blue[800],
                       size: 16,
                     ),
                   ],
@@ -176,7 +175,7 @@ class MainMenuPage extends StatelessWidget {
                   _sairDoApp(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: const Color.fromARGB(255, 18, 53, 100),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.all(16),
                   shape: RoundedRectangleBorder(

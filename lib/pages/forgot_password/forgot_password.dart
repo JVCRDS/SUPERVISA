@@ -12,6 +12,8 @@ class ForgotPasswordPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Recuperar Senha'),
         centerTitle: true,
+        backgroundColor: Colors.transparent, // AppBar transparente
+        elevation: 0, // Remove sombra
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -27,7 +29,7 @@ class ForgotPasswordPage extends StatelessWidget {
                 const Icon(
                   Icons.lock_reset,
                   size: 80,
-                  color: Colors.orange,
+                  color: Colors.blue,
                 ),
                 const SizedBox(height: 20),
                 const Text(

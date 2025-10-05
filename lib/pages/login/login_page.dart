@@ -14,7 +14,18 @@ class LoginPage extends StatelessWidget {
     final passwordController = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Login'), centerTitle: true),
+      appBar: AppBar(
+        title: Image.asset(
+          'assets/icons/Supervisa_Logo.png',
+          height: 300, // Tamanho grande padronizado
+          width: 1000, // Tamanho grande padronizado
+          fit: BoxFit.contain,
+        ),
+        centerTitle: true, // Centralizado (sem botão voltar)
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        // Sem leading (não tem botão de voltar)
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
@@ -22,7 +33,11 @@ class LoginPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.lock_outline, size: 80, color: Colors.blue),
+                Image.asset(
+                  'assets/icons/Supervisa_Icon.png',
+                  width: 80,
+                  height: 80,
+                ),
                 const SizedBox(height: 20),
                 TextField(
                   controller: emailController,
