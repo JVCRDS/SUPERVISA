@@ -101,6 +101,20 @@ class AboutPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
+            Center(
+              child: Text(
+                'João Vitor Candido Ribeiro e Cauan Eduardo Cunha',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[600],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+
             // Divisor
             const Divider(color: Colors.grey),
             const SizedBox(height: 10),
