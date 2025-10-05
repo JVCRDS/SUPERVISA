@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/main.dart';
+import 'package:flutter_application_1/pages/login/login_page.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
@@ -11,169 +13,287 @@ class RegisterPage extends StatelessWidget {
     final confirmPasswordController = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Criar Conta'),
-        centerTitle: true,
-        backgroundColor: Colors.transparent, // AppBar transparente
-        elevation: 0, // Remove sombra
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.person_add,
-                  size: 80,
-                  color: Color.fromARGB(255, 39, 87, 119),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Criar Nova Conta',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 30),
-                TextField(
-                  controller: emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'E-mail',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: passwordController,
-                  decoration: const InputDecoration(
-                    labelText: 'Senha',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock),
-                  ),
-                  obscureText: true,
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: confirmPasswordController,
-                  decoration: const InputDecoration(
-                    labelText: 'Confirmar Senha',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock_outline),
-                  ),
-                  obscureText: true,
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final email = emailController.text.trim();
-                      final password = passwordController.text.trim();
-                      final confirmPassword = confirmPasswordController.text.trim();
-
-                      if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Por favor, preencha todos os campos'),
-                            backgroundColor: Colors.orange,
-                          ),
-                        );
-                        return;
-                      }
-
-                      if (password != confirmPassword) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('As senhas não coincidem'),
-                            backgroundColor: Colors.orange,
-                          ),
-                        );
-                        return;
-                      }
-
-                      if (password.length < 6) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('A senha deve ter pelo menos 6 caracteres'),
-                            backgroundColor: Colors.orange,
-                          ),
-                        );
-                        return;
-                      }
-
-                      try {
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Título centralizado
+            _buildTitle(),
+            const SizedBox(height: 40),
             
-                        final UserCredential userCredential = 
-                            await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                          email: email,
-                          password: password,
-                        );
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('✅ Conta criada com sucesso!'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-
-                        // Volta para o login após 2 segundos
-                        Future.delayed(const Duration(seconds: 2), () {
-                          Navigator.pop(context);
-                        });
-
-                      } on FirebaseAuthException catch (e) {
-                        String mensagemErro;
-                        
-                        if (e.code == 'email-already-in-use') {
-                          mensagemErro = '❌ Este email já está em uso.';
-                        } else if (e.code == 'invalid-email') {
-                          mensagemErro = '❌ Email inválido.';
-                        } else if (e.code == 'weak-password') {
-                          mensagemErro = '❌ Senha muito fraca.';
-                        } else {
-                          mensagemErro = '❌ Erro: ${e.message}';
-                        }
-                        
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(mensagemErro),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('❌ Erro inesperado: $e'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                    ),
-                    child: const Text(
-                      'Criar Conta',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Já tem uma conta? Fazer Login'),
-                ),
-              ],
+            // Campos de cadastro
+            _buildRegisterForm(
+              context,
+              emailController,
+              passwordController,
+              confirmPasswordController,
             ),
-          ),
+            
+            // Botões de ação
+            _buildActionButtons(context),
+          ],
         ),
       ),
     );
+  }
+
+  Widget _buildTitle() {
+    return const Column(
+      children: [
+        Text(
+          'CADASTRO',
+          style: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: Colors.blue,
+          ),
+        ),
+        SizedBox(height: 8),
+        Text(
+          'Crie sua conta',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRegisterForm(
+    BuildContext context,
+    TextEditingController emailController,
+    TextEditingController passwordController,
+    TextEditingController confirmPasswordController,
+  ) {
+    final blueColor = Colors.blue.shade700;
+
+    return Column(
+      children: [
+        TextField(
+          controller: emailController,
+          cursorColor: blueColor,
+          keyboardType: TextInputType.emailAddress,
+          decoration: InputDecoration(
+            labelText: 'E-mail',
+            border: const OutlineInputBorder(),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey.shade400),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: blueColor, width: 2.0),
+            ),
+            prefixIcon: Icon(Icons.email, color: blueColor),
+            labelStyle: TextStyle(color: blueColor),
+            floatingLabelStyle: TextStyle(color: blueColor),
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: passwordController,
+          cursorColor: blueColor,
+          obscureText: true,
+          decoration: InputDecoration(
+            labelText: 'Senha',
+            border: const OutlineInputBorder(),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey.shade400),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: blueColor, width: 2.0),
+            ),
+            prefixIcon: Icon(Icons.lock, color: blueColor),
+            labelStyle: TextStyle(color: blueColor),
+            floatingLabelStyle: TextStyle(color: blueColor),
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: confirmPasswordController,
+          cursorColor: blueColor,
+          obscureText: true,
+          decoration: InputDecoration(
+            labelText: 'Confirmar Senha',
+            border: const OutlineInputBorder(),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey.shade400),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: blueColor, width: 2.0),
+            ),
+            prefixIcon: Icon(Icons.lock_outline, color: blueColor),
+            labelStyle: TextStyle(color: blueColor),
+            floatingLabelStyle: TextStyle(color: blueColor),
+          ),
+        ),
+        const SizedBox(height: 24),
+        
+        // Botão Cadastrar
+        _buildRegisterButton(
+          context, 
+          emailController, 
+          passwordController, 
+          confirmPasswordController
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRegisterButton(
+    BuildContext context,
+    TextEditingController emailController,
+    TextEditingController passwordController,
+    TextEditingController confirmPasswordController,
+  ) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () => _handleRegister(
+          context, 
+          emailController, 
+          passwordController, 
+          confirmPasswordController
+        ),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          backgroundColor: Colors.blue.shade700,
+          foregroundColor: Colors.white,
+        ),
+        child: const Text(
+          'Cadastrar',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoginPage(),
+                ),
+              );
+            },
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              side: BorderSide(color: Colors.blue.shade700),
+              foregroundColor: Colors.blue.shade700,
+            ),
+            child: const Text(
+              'Voltar ao Login',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _handleRegister(
+    BuildContext context,
+    TextEditingController emailController,
+    TextEditingController passwordController,
+    TextEditingController confirmPasswordController,
+  ) async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final confirmPassword = confirmPasswordController.text.trim();
+
+    // Validação dos campos
+    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor, preencha todos os campos!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Verifica se as senhas coincidem
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('As senhas não coincidem!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Verifica o comprimento da senha
+    if (password.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('A senha deve ter pelo menos 6 caracteres!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Tenta criar o usuário
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Sucesso
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Conta criada com sucesso!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Volta para o login após 2 segundos
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      });
+
+    } on FirebaseAuthException catch (e) {
+      // Tratamento específico de erros do Firebase
+      String errorMessage = 'Erro ao criar conta';
+      
+      if (e.code == 'email-already-in-use') {
+        errorMessage = 'Este email já está em uso';
+      } else if (e.code == 'invalid-email') {
+        errorMessage = 'Email inválido';
+      } else if (e.code == 'weak-password') {
+        errorMessage = 'Senha muito fraca';
+      } else if (e.code == 'operation-not-allowed') {
+        errorMessage = 'Operação não permitida';
+      }
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+        ),
+      );
+      logger.e('Register error: $e');
+    } catch (e) {
+      // Erro genérico
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro inesperado: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      logger.e('Unexpected error: $e');
+    }
   }
 }

@@ -64,7 +64,7 @@ class _ChatPageState extends State<ChatPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.black), 
           onPressed: _mostrandoResposta ? _voltarParaGrid : () => Navigator.pop(context),
         ),
       ),
@@ -88,32 +88,36 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
           const SizedBox(height: 8),
-          Container(
-            height: 3,
-            width: 60,
-            color: Colors.blue[800],
+          Center(
+            child: Container(
+              height: 3,
+              width: 60,
+              color: Colors.blue[800],
+            ),
           ),
           const SizedBox(height: 20),
 
           // Instrução
-          Text(
-            'Toque ou digite sua dúvida para continuar.',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[700],
+          Center(
+            child: Text(
+              'Toque ou digite sua dúvida para continuar.',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[700],
+              ),
             ),
           ),
           const SizedBox(height: 30),
 
-          // Grid de perguntas - FIXEI O OVERFLOW AQUI
+          // Grid de perguntas
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              crossAxisSpacing: 12, // Reduzi o espaçamento
+              crossAxisSpacing: 12,
               mainAxisSpacing: 12,
-              childAspectRatio: 1.1, // Ajuste para melhor proporção
+              childAspectRatio: 1.1,
             ),
             itemCount: _perguntasFrequentes.length,
             itemBuilder: (context, index) {
@@ -131,7 +135,7 @@ class _ChatPageState extends State<ChatPage> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: Colors.green[700],
+                color: Colors.blue[700], // Alterado para azul
               ),
             ),
           ),
@@ -164,7 +168,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // CARD DE PERGUNTA - CORRIGIDO OVERFLOW
+  // CARD DE PERGUNTA
   Widget _buildCardPergunta(int index) {
     final Map<String, String> icones = {
       'Como prevenir a dengue?': 'assets/icons/Icon_Doença.png',
@@ -185,26 +189,25 @@ class _ChatPageState extends State<ChatPage> {
         onTap: () => _mostrarResposta(index),
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          padding: const EdgeInsets.all(10),
-          height: 140, // Altura fixa para consistência
+          padding: const EdgeInsets.all(16), 
+          height: 160, 
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // ÍCONE
               Image.asset(
                 caminhoIcone,
-                width: 32,
-                height: 32,
+                width: 48, 
+                height: 48, 
                 fit: BoxFit.contain,
               ),
-              const SizedBox(height: 8),
-              // TEXTO COM SCROLL VERTICAL
+              const SizedBox(height: 12),
+              // TEXTO
               Expanded(
                 child: SingleChildScrollView(
                   child: Text(
                     pergunta,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 13,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey[800],
                     ),
@@ -219,7 +222,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // TELA DE RESPOSTA - AGORA COM SCROLL
+  // TELA DE RESPOSTA
   Widget _buildTelaResposta() {
     return Column(
       children: [
@@ -239,8 +242,8 @@ class _ChatPageState extends State<ChatPage> {
                       children: [
                         Image.asset(
                           'assets/icons/Chat_icon.png',
-                          width: 24,
-                          height: 24,
+                          width: 32, 
+                          height: 32, 
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -258,7 +261,7 @@ class _ChatPageState extends State<ChatPage> {
                 ),
                 const SizedBox(height: 20),
 
-                // Resposta do assistente - AGORA PODE SER LONGA
+                // Resposta do assistente
                 Card(
                   color: Colors.blue[50],
                   child: Padding(
@@ -268,8 +271,8 @@ class _ChatPageState extends State<ChatPage> {
                       children: [
                         Image.asset(
                           'assets/icons/Supervisa_Icon.png',
-                          width: 24,
-                          height: 24,
+                          width: 32, 
+                          height: 32, 
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -305,7 +308,7 @@ class _ChatPageState extends State<ChatPage> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: Colors.blue[700],
+                    color: Colors.blue[700], 
                   ),
                 ),
               ),
@@ -325,7 +328,11 @@ class _ChatPageState extends State<ChatPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('Ver mais perguntas'),
+                      child: const Text(
+                        'Ver mais perguntas',
+                        textAlign: TextAlign.center, 
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -340,7 +347,11 @@ class _ChatPageState extends State<ChatPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('Voltar ao menu'),
+                      child: const Text(
+                        'Voltar ao menu',
+                        textAlign: TextAlign.center, 
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 ],
