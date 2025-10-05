@@ -135,7 +135,7 @@ class _ChatPageState extends State<ChatPage> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: Colors.blue[700], // Alterado para azul
+                color: Colors.blue[700],
               ),
             ),
           ),
