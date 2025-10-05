@@ -100,7 +100,7 @@ class _ChatPageState extends State<ChatPage> {
           // Instrução
           Center(
             child: Text(
-              'Toque ou digite sua dúvida para continuar.',
+              'Toque em sua dúvida para continuar.',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[700],
