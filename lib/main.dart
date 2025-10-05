@@ -1,9 +1,20 @@
-import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
-void main() {
-  runApp( DevicePreview(
-    builder: (context) => const MainApp(),
-  ));
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+
+import 'firebase_options.dart';
+import 'pages/login/login_page.dart';
+
+var logger = Logger();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  logger.d(
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    ),
+  );
+  runApp(DevicePreview(builder: (context) => const MainApp()));
 }
 
 class MainApp extends StatelessWidget {
@@ -11,12 +22,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
+    return const MaterialApp(home: LoginPage());
   }
 }
