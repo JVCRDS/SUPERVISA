@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "406470641375",
+    "project_id": "supervisa-7f491",
+    "storage_bucket": "supervisa-7f491.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:406470641375:android:d0474a33d334169f8acb6a",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCy0KOGXqJa_9am3Q8DAdtc4fA4ZNPA49A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
