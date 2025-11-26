@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '/services/genkit_service.dart';
 import '/services/firestore_service.dart';
 
 class ChatConversationPage extends StatefulWidget {
@@ -19,12 +20,21 @@ class ChatConversationPage extends StatefulWidget {
 class _ChatConversationPageState extends State<ChatConversationPage> {
   final List<Map<String, dynamic>> _mensagens = [];
   final TextEditingController _textController = TextEditingController();
+  late GenKitService _genkitService;
   final FirestoreService _firestoreService = FirestoreService();
   final User? _currentUser = FirebaseAuth.instance.currentUser;
+  bool _isTyping = false;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    
+    // ✅ INICIALIZA COM USER ID PARA MEMÓRIA
+    _genkitService = GenKitService(
+      userId: _currentUser?.uid ?? 'anonimo',
+    );
+
     // Adiciona a primeira pergunta e resposta
     _mensagens.add({
       'texto': widget.perguntaInicial,
@@ -37,19 +47,34 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
       'timestamp': DateTime.now().add(const Duration(seconds: 1)),
     });
 
+    // Salva a primeira pergunta no Firestore
     _salvarPerguntaNoFirestore(
       widget.perguntaInicial,
       widget.respostaInicial,
     );
+
+    // Scroll para baixo após build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
   }
 
-  
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
   void _salvarPerguntaNoFirestore(String pergunta, String resposta) {
     if (_currentUser != null) {
       _firestoreService.saveQuestion(
         userId: _currentUser!.uid,
         userEmail: _currentUser!.email ?? 'Não informado',
-        userName: 'Usuário', // Você pode pegar do Firestore depois
+        userName: _currentUser!.displayName ?? 'Usuário',
         question: pergunta,
         answer: resposta,
         topic: _identificarTopico(pergunta),
@@ -57,7 +82,6 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     }
   }
 
-  // ✅ IDENTIFICAR TÓPICO DA PERGUNTA
   String _identificarTopico(String pergunta) {
     final perguntaLower = pergunta.toLowerCase();
     
@@ -65,16 +89,18 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
       return 'Dengue';
     } else if (perguntaLower.contains('escorpião') || perguntaLower.contains('picada')) {
       return 'Escorpião';
-    } else if (perguntaLower.contains('restaurante') || perguntaLower.contains('norma')) {
+    } else if (perguntaLower.contains('restaurante') || perguntaLower.contains('norma') || perguntaLower.contains('higiene')) {
       return 'Restaurante';
-    } else if (perguntaLower.contains('terreno') || perguntaLower.contains('plantar')) {
+    } else if (perguntaLower.contains('terreno') || perguntaLower.contains('plantar') || perguntaLower.contains('baldio')) {
       return 'Terreno Baldio';
+    } else if (perguntaLower.contains('contato') || perguntaLower.contains('telefone') || perguntaLower.contains('email')) {
+      return 'Contato';
     } else {
       return 'Geral';
     }
   }
 
-  void _enviarMensagem(String texto) {
+  void _enviarMensagem(String texto) async {
     if (texto.trim().isEmpty) return;
 
     setState(() {
@@ -83,15 +109,18 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
         'isUser': true,
         'timestamp': DateTime.now(),
       });
+      _isTyping = true;
     });
 
     _textController.clear();
+    _scrollToBottom();
 
-    // Simular resposta do bot após 1 segundo
-    Future.delayed(const Duration(seconds: 1), () {
-      final resposta = _gerarResposta(texto);
+    try {
+      // ✅ CHAMA O GENKIT COM MEMÓRIA
+      final resposta = await _genkitService.gerarRespostaComContexto(texto);
       
       setState(() {
+        _isTyping = false;
         _mensagens.add({
           'texto': resposta,
           'isUser': false,
@@ -99,26 +128,22 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
         });
       });
 
- 
+      // Salva no Firestore
       _salvarPerguntaNoFirestore(texto, resposta);
-    });
-  }
+      _scrollToBottom();
 
-  String _gerarResposta(String pergunta) {
-    final perguntaLower = pergunta.toLowerCase();
-    
-    if (perguntaLower.contains('dengue') || perguntaLower.contains('prevenção') || perguntaLower.contains('mosquito')) {
-      return 'Para prevenir a dengue, é importante eliminar criadouros do mosquito. Elimine água parada, use repelente e mantenha caixas d\'água fechadas. Em caso de sintomas, procure uma unidade de saúde.';
-    } else if (perguntaLower.contains('escorpião') || perguntaLower.contains('picada')) {
-      return 'Ao encontrar escorpiões, não tente capturar. Chame a Divisão de Vigilância Ambiental. Em caso de picada, procure IMEDIATAMENTE atendimento médico.';
-    } else if (perguntaLower.contains('restaurante') || perguntaLower.contains('norma') || perguntaLower.contains('higiene')) {
-      return 'Para restaurantes, é necessário seguir as normas de higiene e segurança alimentar. Mantenha funcionários treinados, controle de temperatura e higienização adequada.';
-    } else if (perguntaLower.contains('terreno') || perguntaLower.contains('plantar') || perguntaLower.contains('baldio')) {
-      return 'Para plantar em terrenos baldios, é necessário autorização da prefeitura e concordância do proprietário. Consulte a Secretaria do Meio Ambiente.';
-    } else if (perguntaLower.contains('contato') || perguntaLower.contains('telefone') || perguntaLower.contains('email')) {
-      return 'Você pode entrar em contato com a Divisão de Vigilância Ambiental:\nNORTE: (16) 3638-0562\nSUL: (16) 3914-3431\nLESTE: (16) 3624-7234\nOESTE: (16) 3630-7844\nCENTRAL: (16) 3610-4740';
-    } else {
-      return 'Obrigado pela sua pergunta! Para questões específicas sobre vigilância em saúde, entre em contato com a Divisão de Vigilância Ambiental ou consulte nosso suporte técnico.';
+    } catch (e) {
+      setState(() {
+        _isTyping = false;
+        _mensagens.add({
+          'texto': 'Desculpe, estou com problemas técnicos no momento. '
+                   'Por favor, tente novamente ou entre em contato com a Zoonoses.',
+          'isUser': false,
+          'timestamp': DateTime.now(),
+        });
+      });
+      _scrollToBottom();
+      print('❌ Erro no chat: $e');
     }
   }
 
@@ -137,7 +162,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -146,10 +171,13 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
           // Área das mensagens
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               padding: const EdgeInsets.all(16.0),
-              reverse: false,
-              itemCount: _mensagens.length,
+              itemCount: _mensagens.length + (_isTyping ? 1 : 0),
               itemBuilder: (context, index) {
+                if (_isTyping && index == _mensagens.length) {
+                  return _buildTypingIndicator();
+                }
                 final mensagem = _mensagens[index];
                 return _buildMensagemBubble(mensagem);
               },
@@ -183,6 +211,8 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
                         horizontal: 16,
                         vertical: 12,
                       ),
+                      filled: true,
+                      fillColor: Colors.grey[50],
                     ),
                     onSubmitted: _enviarMensagem,
                   ),
@@ -191,7 +221,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
                 CircleAvatar(
                   backgroundColor: Colors.blue[800],
                   child: IconButton(
-                    icon: const Icon(Icons.send, color: Colors.white),
+                    icon: const Icon(Icons.send, color: Colors.white, size: 20),
                     onPressed: () => _enviarMensagem(_textController.text),
                   ),
                 ),
@@ -203,34 +233,87 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     );
   }
 
-  Widget _buildMensagemBubble(Map<String, dynamic> mensagem) {
+  // 👇 INDICADOR DE QUE A IA ESTÁ DIGITANDO
+  Widget _buildTypingIndicator() {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (!mensagem['isUser'])
+          CircleAvatar(
+            backgroundColor: Colors.transparent,
+            backgroundImage: AssetImage('assets/icons/Supervisa_Icon.png'),
+            radius: 16,
+          ),
+          const SizedBox(width: 8),
+          Card(
+            color: Colors.blue[50],
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Digitando',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMensagemBubble(Map<String, dynamic> mensagem) {
+    final isUser = mensagem['isUser'] as bool;
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        children: [
+          if (!isUser) ...[
             CircleAvatar(
               backgroundColor: Colors.transparent,
               backgroundImage: AssetImage('assets/icons/Supervisa_Icon.png'),
               radius: 16,
             ),
-          if (!mensagem['isUser']) const SizedBox(width: 8),
+            const SizedBox(width: 8),
+          ],
           Expanded(
             child: Column(
-              crossAxisAlignment: mensagem['isUser'] 
-                  ? CrossAxisAlignment.end 
-                  : CrossAxisAlignment.start,
+              crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 Card(
-                  color: mensagem['isUser'] 
-                      ? Colors.blue[50] 
-                      : Colors.grey[50],
+                  color: isUser ? Colors.blue[50] : Colors.grey[50],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Text(
                       mensagem['texto'],
-                      style: const TextStyle(fontSize: 16),
+                      style: TextStyle(
+                        fontSize: 16,
+                        height: 1.4,
+                        color: Colors.grey[800],
+                      ),
                     ),
                   ),
                 ),
@@ -245,13 +328,14 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
               ],
             ),
           ),
-          if (mensagem['isUser']) const SizedBox(width: 8),
-          if (mensagem['isUser'])
+          if (isUser) ...[
+            const SizedBox(width: 8),
             const CircleAvatar(
               backgroundColor: Colors.blue,
               radius: 16,
               child: Icon(Icons.person, color: Colors.white, size: 16),
             ),
+          ],
         ],
       ),
     );
@@ -259,5 +343,12 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
 
   String _formatarHora(DateTime timestamp) {
     return '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 }
