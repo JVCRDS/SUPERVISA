@@ -19,31 +19,32 @@ class GenKitService {
       model: 'gemini-2.5-flash',
       apiKey: _apiKey,
     );
-    print(' Gemini Inicializado, user: $_userId');
+    print('Gemini Inicializado, user: $_userId, API Key: ${_apiKey.isNotEmpty ? "PRESENTE" : "AUSENTE"}');
   }
 
   String _loadApiKey() {
     try {
       final key = dotenv.env['GOOGLE_API_KEY'];
       if (key != null && key.isNotEmpty) {
-        print('API Key loaded successfully');
+        print('API Key carregada do .env com sucesso');
         return key;
+      } else {
+        print('API Key encontrada no .env mas está vazia');
       }
     } catch (e) {
-      print('Error loading .env: $e');
+      print('Erro ao carregar .env: $e');
     }
     
-    print('API Key not found, using empty fallback');
+    print('API Key não encontrada, usando fallback vazio');
     return "";
   }
 
   Future<String> gerarRespostaComContexto(String pergunta) async {
-    // SE NÃO TEM API KEY, RETORNA MENSAGEM AMIGÁVEL
     if (_apiKey.isEmpty) {
       return "Olá! Em que posso ajudar você hoje? Pode me perguntar sobre dengue, escorpiões, terrenos baldios ou restaurantes. No momento estou com limitações técnicas, mas posso orientar com informações básicas.";
     }
     
-    print('Calling Gemini - Pergunta: "$pergunta"');
+    print('Chamando Gemini - Pergunta: "$pergunta"');
     
     try {
       final historico = await _buscarHistoricoComFiltro();
@@ -76,17 +77,16 @@ NOVA PERGUNTA: "$pergunta"
 RESPOSTA NATURAL (considere o histórico):
 ''';
 
-      print('Sending for Gemini...');
       final response = await _model.generateContent([Content.text(prompt)]);
       
       String resposta = response.text ?? _respostaPadrao(pergunta);
-      print('Response: $resposta');
+      print('Resposta do Gemini: $resposta');
       
       await _salvarInteracao(pergunta, resposta);
       return resposta;
 
     } catch (e) {
-      print('ERROR: $e');
+      print('ERRO no Gemini: $e');
       return _respostaPadrao(pergunta);
     }
   }
@@ -117,7 +117,7 @@ RESPOSTA NATURAL (considere o histórico):
 
       return buffer.toString();
     } catch (e) {
-      print('ERROR: não foi possível buscar histórico: $e');
+      print('ERRO ao buscar histórico: $e');
       return 'Sem histórico disponível no momento.';
     }
   }
@@ -131,9 +131,9 @@ RESPOSTA NATURAL (considere o histórico):
         'timestamp': FieldValue.serverTimestamp(),
         'topic': _identificarTopico(pergunta),
       });
-      print('Saved in Firestore, user: $_userId');
+      print('Salvo no Firestore, user: $_userId');
     } catch (e) {
-      print('ERROR (SAVE PROCESS): $e');
+      print('ERRO ao salvar no Firestore: $e');
     }
   }
 

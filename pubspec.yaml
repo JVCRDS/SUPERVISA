@@ -1,15 +1,16 @@
 name: flutter_application_1
-description: "A new Flutter project."
+description: "Aplicativo Supervisa - Secretaria da Saúde"
 publish_to: 'none'
-version: 0.1.0
+version: 1.0.0+1
 
 environment:
-  sdk: ^3.9.2
+  sdk: '>=3.9.2 <4.0.0'
 
 dependencies:
-  logger: ^2.0.0
   flutter:
     sdk: flutter
+  cupertino_icons: ^1.0.2
+  logger: ^2.0.0
   device_preview: ^1.3.1
   firebase_core: ^4.1.1
   firebase_auth: ^6.1.0
@@ -23,7 +24,7 @@ dev_dependencies:
   flutter_lints: ^5.0.0
 
 flutter:
-  assets:
-    - assets/.env
-    - assets/icons/
   uses-material-design: true
+  assets:
+    - assets/icons/
+    - .env
