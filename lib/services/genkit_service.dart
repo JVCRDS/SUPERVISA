@@ -23,21 +23,41 @@ class GenKitService {
   }
 
   String _loadApiKey() {
-    try {
-      final key = dotenv.env['GOOGLE_API_KEY'];
-      if (key != null && key.isNotEmpty) {
-        print('API Key carregada do .env com sucesso');
-        return key;
-      } else {
-        print('API Key encontrada no .env mas está vazia');
-      }
-    } catch (e) {
-      print('Erro ao carregar .env: $e');
-    }
-    
-    print('API Key não encontrada, usando fallback vazio');
-    return "";
+  print('INICIANDO BUSCA DA API KEY...');
+  
+ 
+  const String environmentKey = String.fromEnvironment('GOOGLE_API_KEY');
+  print('Variável de ambiente GOOGLE_API_KEY: "${environmentKey}"');
+  print('Tamanho da string: ${environmentKey.length}');
+  print('Está vazia? ${environmentKey.isEmpty}');
+  
+  if (environmentKey.isNotEmpty) {
+    print('API Key carregada do ambiente de produção');
+    print('Key (primeiros 10 chars): ${environmentKey.substring(0, environmentKey.length > 10 ? 10 : environmentKey.length)}...');
+    return environmentKey;
   }
+  
+
+  try {
+    print('Tentando carregar do .env...');
+    final key = dotenv.env['GOOGLE_API_KEY'];
+    print('Chave do .env: "$key"');
+    
+    if (key != null && key.isNotEmpty) {
+      print(' API Key carregada do .env (desenvolvimento)');
+      return key;
+    } else {
+      print('.env carregado mas GOOGLE_API_KEY está vazia ou não existe');
+    }
+  } catch (e) {
+    print('Erro ao carregar .env: $e');
+  }
+  
+
+  print('MODO SEGURO: API Key NÃO ENCONTRADA em nenhum lugar!');
+  print('SOLUÇÃO: Execute com --dart-define=GOOGLE_API_KEY=sua_chave ou configure .env');
+  return "";
+}
 
   Future<String> gerarRespostaComContexto(String pergunta) async {
     if (_apiKey.isEmpty) {
