@@ -30,11 +30,9 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
   void initState() {
     super.initState();
     
-
     _genkitService = GenKitService(
       userId: _currentUser?.uid ?? 'anonimo',
     );
-
 
     _mensagens.add({
       'texto': widget.perguntaInicial,
@@ -47,12 +45,10 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
       'timestamp': DateTime.now().add(const Duration(seconds: 1)),
     });
 
-
     _salvarPerguntaNoFirestore(
       widget.perguntaInicial,
       widget.respostaInicial,
     );
-
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
@@ -72,9 +68,9 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
   void _salvarPerguntaNoFirestore(String pergunta, String resposta) {
     if (_currentUser != null) {
       _firestoreService.saveQuestion(
-        userId: _currentUser.uid,
-        userEmail: _currentUser.email ?? 'Não informado',
-        userName: _currentUser.displayName ?? 'Usuário',
+        userId: _currentUser!.uid,
+        userEmail: _currentUser!.email ?? 'Não informado',
+        userName: _currentUser!.displayName ?? 'Usuário',
         question: pergunta,
         answer: resposta,
         topic: _identificarTopico(pergunta),
@@ -116,7 +112,6 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     _scrollToBottom();
 
     try {
-
       final resposta = await _genkitService.gerarRespostaComContexto(texto);
       
       setState(() {
@@ -167,7 +162,6 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
       ),
       body: Column(
         children: [
-          // Área das mensagens
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
@@ -231,7 +225,6 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     );
   }
 
-
   Widget _buildTypingIndicator() {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -239,8 +232,8 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
-            backgroundColor: Colors.transparent,
-            backgroundImage: AssetImage('assets/icons/Supervisa_Icon.png'),
+            backgroundColor: Colors.blue[100],
+            child: const Icon(Icons.health_and_safety, color: Colors.blue),
             radius: 16,
           ),
           const SizedBox(width: 8),
@@ -288,8 +281,8 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
         children: [
           if (!isUser) ...[
             CircleAvatar(
-              backgroundColor: Colors.transparent,
-              backgroundImage: AssetImage('assets/icons/Supervisa_Icon.png'),
+              backgroundColor: Colors.blue[100],
+              child: const Icon(Icons.health_and_safety, color: Colors.blue),
               radius: 16,
             ),
             const SizedBox(width: 8),
