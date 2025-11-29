@@ -30,12 +30,12 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
   void initState() {
     super.initState();
     
-    // ✅ INICIALIZA COM USER ID PARA MEMÓRIA
+
     _genkitService = GenKitService(
       userId: _currentUser?.uid ?? 'anonimo',
     );
 
-    // Adiciona a primeira pergunta e resposta
+
     _mensagens.add({
       'texto': widget.perguntaInicial,
       'isUser': true,
@@ -47,13 +47,13 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
       'timestamp': DateTime.now().add(const Duration(seconds: 1)),
     });
 
-    // Salva a primeira pergunta no Firestore
+
     _salvarPerguntaNoFirestore(
       widget.perguntaInicial,
       widget.respostaInicial,
     );
 
-    // Scroll para baixo após build
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
     });
@@ -116,7 +116,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     _scrollToBottom();
 
     try {
-      // ✅ CHAMA O GENKIT COM MEMÓRIA
+
       final resposta = await _genkitService.gerarRespostaComContexto(texto);
       
       setState(() {
@@ -128,7 +128,6 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
         });
       });
 
-      // Salva no Firestore
       _salvarPerguntaNoFirestore(texto, resposta);
       _scrollToBottom();
 
@@ -143,7 +142,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
         });
       });
       _scrollToBottom();
-      print('❌ Erro no chat: $e');
+      print('Error in chat: $e');
     }
   }
 
@@ -184,7 +183,6 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
             ),
           ),
 
-          // Área de digitação
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
@@ -233,7 +231,7 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
     );
   }
 
-  // 👇 INDICADOR DE QUE A IA ESTÁ DIGITANDO
+
   Widget _buildTypingIndicator() {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),

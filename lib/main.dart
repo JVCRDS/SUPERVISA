@@ -5,8 +5,12 @@ import 'package:logger/logger.dart';
 import 'firebase_options.dart';
 import 'pages/login/login_page.dart';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+
 var logger = Logger();
 void main() async {
+  await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
   logger.d(
     await Firebase.initializeApp(

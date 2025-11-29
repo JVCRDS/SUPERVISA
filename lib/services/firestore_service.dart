@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // ✅ SALVAR USUÁRIO
   Future<void> saveUser({
     required String userId,
     required String name,
@@ -22,14 +21,14 @@ class FirestoreService {
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
-      print('✅ Usuário salvo no Firestore: $email');
+      print('User saved in Firestore: $email');
     } catch (e) {
-      print('❌ Erro ao salvar usuário no Firestore: $e');
+      print('ERROR: não foi possível salvar usuário no Firestore: $e');
       throw e;
     }
   }
 
-  // ✅ SALVAR PERGUNTA NO CHAT
+ 
   Future<void> saveQuestion({
     required String userId,
     required String userEmail,
@@ -49,14 +48,14 @@ class FirestoreService {
         'timestamp': FieldValue.serverTimestamp(),
         'status': 'answered',
       });
-      print('✅ Pergunta salva no Firestore: $question');
+      print('Question saved in Firestore: $question');
     } catch (e) {
-      print('❌ Erro ao salvar pergunta no Firestore: $e');
+      print('ERROR: não foi possível salvar pergunta no Firestore: $e');
       throw e;
     }
   }
 
-  // ✅ BUSCAR PERGUNTAS SIMILARES DO BANCO
+
   Future<List<Map<String, dynamic>>> getPerguntasSimilares(String pergunta) async {
     try {
       final snapshot = await _db.collection('questions')
@@ -72,12 +71,11 @@ class FirestoreService {
 
       return perguntasSimilares;
     } catch (e) {
-      print('❌ Erro ao buscar perguntas similares: $e');
+      print('ERROR: não foi possível buscar perguntas similares: $e');
       return [];
     }
   }
 
-  // ✅ VERIFICA SE AS PERGUNTAS SÃO SIMILARES
   bool _isPerguntaSimilar(String pergunta1, String pergunta2) {
     final palavras1 = pergunta1.toLowerCase().split(' ');
     final palavras2 = pergunta2.toLowerCase().split(' ');
@@ -87,7 +85,6 @@ class FirestoreService {
     return palavrasComuns >= 2;
   }
 
-  // ✅ BUSCAR RESPOSTAS MAIS FREQUENTES POR TÓPICO
   Future<Map<String, dynamic>> getRespostasFrequentes(String topico) async {
     try {
       final snapshot = await _db.collection('questions')
@@ -113,12 +110,11 @@ class FirestoreService {
         'totalPerguntas': snapshot.docs.length,
       };
     } catch (e) {
-      print('❌ Erro ao buscar respostas frequentes: $e');
+      print('ERROR, não foi possível buscar respostas frequentes: $e');
       return {};
     }
   }
 
-  // ✅ BUSCAR PERGUNTAS DO USUÁRIO
   Stream<QuerySnapshot> getUserQuestions(String userId) {
     return _db.collection('questions')
         .where('userId', isEqualTo: userId)

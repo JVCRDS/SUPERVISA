@@ -1,5 +1,8 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+String apiKey = dotenv.env['GOOGLE_API_KEY']!;
 
 class GenKitService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -7,24 +10,22 @@ class GenKitService {
   final String _userId;
 
   GenKitService({String? userId}) : _userId = userId ?? 'anonimo' {
-    _initializeModel(); // ✅ CHAMANDO NO CONSTRUTOR
+    _initializeModel(); 
   }
 
   void _initializeModel() {
-    const String apiKey = 'AIzaSyDXkAV8oPX-Sas8v3vhcUK9s97xCSHgp78';
     
     _model = GenerativeModel(
       model: 'gemini-2.5-flash',
       apiKey: apiKey,
     );
-    print('✅ IA Inicializada para usuário: $_userId');
+    print(' Gemini Inicializado, user: $_userId');
   }
 
   Future<String> gerarRespostaComContexto(String pergunta) async {
-    print('🔄 CHAMANDO IA - Pergunta: "$pergunta"');
+    print('Calling Gemini - Pergunta: "$pergunta"');
     
     try {
-      // ✅ BUSCA HISTÓRICO COM FILTRO COMPLETO
       final historico = await _buscarHistoricoComFiltro();
       
       final prompt = '''
@@ -55,22 +56,22 @@ NOVA PERGUNTA: "$pergunta"
 RESPOSTA NATURAL (considere o histórico):
 ''';
 
-      print('📤 Enviando para IA...');
+      print('Sending for Gemini...');
       final response = await _model.generateContent([Content.text(prompt)]);
       
       String resposta = response.text ?? _respostaPadrao(pergunta);
-      print('📥 Resposta: $resposta');
+      print('Response: $resposta');
       
       await _salvarInteracao(pergunta, resposta);
       return resposta;
 
     } catch (e) {
-      print('💥 ERRO NA IA: $e');
+      print('ERROR: $e');
       return _respostaPadrao(pergunta);
     }
   }
 
-  // ✅ BUSCA HISTÓRICO COM FILTRO COMPLETO
+
   Future<String> _buscarHistoricoComFiltro() async {
     try {
       final snapshot = await _firestore.collection('questions')
@@ -97,7 +98,7 @@ RESPOSTA NATURAL (considere o histórico):
 
       return buffer.toString();
     } catch (e) {
-      print('❌ Erro ao buscar histórico: $e');
+      print('ERROR: não foi possível buscar histórico: $e');
       return 'Sem histórico disponível no momento.';
     }
   }
@@ -111,9 +112,9 @@ RESPOSTA NATURAL (considere o histórico):
         'timestamp': FieldValue.serverTimestamp(),
         'topic': _identificarTopico(pergunta),
       });
-      print('💾 Salvo no Firestore para usuário: $_userId');
+      print('Saved in Firestore, user: $_userId');
     } catch (e) {
-      print('❌ Erro ao salvar: $e');
+      print('ERROR (SAVE PROCESS): $e');
     }
   }
 
