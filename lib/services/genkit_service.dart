@@ -2,27 +2,47 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-String apiKey = dotenv.env['GOOGLE_API_KEY']!;
-
 class GenKitService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   late GenerativeModel _model;
   final String _userId;
+  late String _apiKey;
 
   GenKitService({String? userId}) : _userId = userId ?? 'anonimo' {
     _initializeModel(); 
   }
 
   void _initializeModel() {
+    _apiKey = _loadApiKey();
     
     _model = GenerativeModel(
       model: 'gemini-2.5-flash',
-      apiKey: apiKey,
+      apiKey: _apiKey,
     );
     print(' Gemini Inicializado, user: $_userId');
   }
 
+  String _loadApiKey() {
+    try {
+      final key = dotenv.env['GOOGLE_API_KEY'];
+      if (key != null && key.isNotEmpty) {
+        print('API Key loaded successfully');
+        return key;
+      }
+    } catch (e) {
+      print('Error loading .env: $e');
+    }
+    
+    print('API Key not found, using empty fallback');
+    return "";
+  }
+
   Future<String> gerarRespostaComContexto(String pergunta) async {
+    // SE NÃO TEM API KEY, RETORNA MENSAGEM AMIGÁVEL
+    if (_apiKey.isEmpty) {
+      return "Olá! Em que posso ajudar você hoje? Pode me perguntar sobre dengue, escorpiões, terrenos baldios ou restaurantes. No momento estou com limitações técnicas, mas posso orientar com informações básicas.";
+    }
+    
     print('Calling Gemini - Pergunta: "$pergunta"');
     
     try {
@@ -70,7 +90,6 @@ RESPOSTA NATURAL (considere o histórico):
       return _respostaPadrao(pergunta);
     }
   }
-
 
   Future<String> _buscarHistoricoComFiltro() async {
     try {
