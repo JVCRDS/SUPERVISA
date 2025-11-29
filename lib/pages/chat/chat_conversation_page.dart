@@ -66,17 +66,17 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
   }
 
   void _salvarPerguntaNoFirestore(String pergunta, String resposta) {
-    if (_currentUser != null) {
-      _firestoreService.saveQuestion(
-        userId: _currentUser!.uid,
-        userEmail: _currentUser!.email ?? 'Não informado',
-        userName: _currentUser!.displayName ?? 'Usuário',
-        question: pergunta,
-        answer: resposta,
-        topic: _identificarTopico(pergunta),
-      );
-    }
+  if (_currentUser != null) {
+    _firestoreService.saveQuestion(
+      userId: _currentUser.uid,
+      userEmail: _currentUser.email ?? 'Não informado',
+      userName: _currentUser.displayName ?? 'Usuário',
+      question: pergunta,
+      answer: resposta,
+      topic: _identificarTopico(pergunta),
+    );
   }
+}
 
   String _identificarTopico(String pergunta) {
     final perguntaLower = pergunta.toLowerCase();
