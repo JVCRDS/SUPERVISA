@@ -30,68 +30,91 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
   void initState() {
     super.initState();
     
-    _genkitService = GenKitService(
-      userId: _currentUser?.uid ?? 'anonimo',
-    );
+    try {
+      _genkitService = GenKitService(
+        userId: _currentUser?.uid ?? 'anonimo',
+      );
 
-    _mensagens.add({
-      'texto': widget.perguntaInicial,
-      'isUser': true,
-      'timestamp': DateTime.now(),
-    });
-    _mensagens.add({
-      'texto': widget.respostaInicial,
-      'isUser': false,
-      'timestamp': DateTime.now().add(const Duration(seconds: 1)),
-    });
+      _mensagens.add({
+        'texto': widget.perguntaInicial,
+        'isUser': true,
+        'timestamp': DateTime.now(),
+      });
+      _mensagens.add({
+        'texto': widget.respostaInicial,
+        'isUser': false,
+        'timestamp': DateTime.now().add(const Duration(seconds: 1)),
+      });
 
-    _salvarPerguntaNoFirestore(
-      widget.perguntaInicial,
-      widget.respostaInicial,
-    );
+      _salvarPerguntaNoFirestore(
+        widget.perguntaInicial,
+        widget.respostaInicial,
+      );
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToBottom();
-    });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToBottom();
+      });
+    } catch (e, stack) {
+      print('ERROR IN INITSTATE: $e');
+      print('STACK TRACE: $stack');
+      _mensagens.add({
+        'texto': 'Erro ao carregar conversa. Tente novamente.',
+        'isUser': false,
+        'timestamp': DateTime.now(),
+      });
+    }
   }
 
   void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+    try {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    } catch (e) {
+      print('Error scrolling: $e');
     }
   }
 
   void _salvarPerguntaNoFirestore(String pergunta, String resposta) {
-  if (_currentUser != null) {
-    _firestoreService.saveQuestion(
-      userId: _currentUser.uid,
-      userEmail: _currentUser.email ?? 'Não informado',
-      userName: _currentUser.displayName ?? 'Usuário',
-      question: pergunta,
-      answer: resposta,
-      topic: _identificarTopico(pergunta),
-    );
+    try {
+      if (_currentUser != null) {
+        _firestoreService.saveQuestion(
+          userId: _currentUser.uid,
+          userEmail: _currentUser.email ?? 'Não informado',
+          userName: _currentUser.displayName ?? 'Usuário',
+          question: pergunta,
+          answer: resposta,
+          topic: _identificarTopico(pergunta),
+        );
+      }
+    } catch (e, stack) {
+      print('ERROR SAVING TO FIRESTORE: $e');
+      print('STACK TRACE: $stack');
+    }
   }
-}
 
   String _identificarTopico(String pergunta) {
-    final perguntaLower = pergunta.toLowerCase();
-    
-    if (perguntaLower.contains('dengue') || perguntaLower.contains('mosquito')) {
-      return 'Dengue';
-    } else if (perguntaLower.contains('escorpião') || perguntaLower.contains('picada')) {
-      return 'Escorpião';
-    } else if (perguntaLower.contains('restaurante') || perguntaLower.contains('norma') || perguntaLower.contains('higiene')) {
-      return 'Restaurante';
-    } else if (perguntaLower.contains('terreno') || perguntaLower.contains('plantar') || perguntaLower.contains('baldio')) {
-      return 'Terreno Baldio';
-    } else if (perguntaLower.contains('contato') || perguntaLower.contains('telefone') || perguntaLower.contains('email')) {
-      return 'Contato';
-    } else {
+    try {
+      final perguntaLower = pergunta.toLowerCase();
+      
+      if (perguntaLower.contains('dengue') || perguntaLower.contains('mosquito')) {
+        return 'Dengue';
+      } else if (perguntaLower.contains('escorpião') || perguntaLower.contains('picada')) {
+        return 'Escorpião';
+      } else if (perguntaLower.contains('restaurante') || perguntaLower.contains('norma') || perguntaLower.contains('higiene')) {
+        return 'Restaurante';
+      } else if (perguntaLower.contains('terreno') || perguntaLower.contains('plantar') || perguntaLower.contains('baldio')) {
+        return 'Terreno Baldio';
+      } else if (perguntaLower.contains('contato') || perguntaLower.contains('telefone') || perguntaLower.contains('email')) {
+        return 'Contato';
+      } else {
+        return 'Geral';
+      }
+    } catch (e) {
       return 'Geral';
     }
   }
@@ -99,19 +122,19 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
   void _enviarMensagem(String texto) async {
     if (texto.trim().isEmpty) return;
 
-    setState(() {
-      _mensagens.add({
-        'texto': texto,
-        'isUser': true,
-        'timestamp': DateTime.now(),
-      });
-      _isTyping = true;
-    });
-
-    _textController.clear();
-    _scrollToBottom();
-
     try {
+      setState(() {
+        _mensagens.add({
+          'texto': texto,
+          'isUser': true,
+          'timestamp': DateTime.now(),
+        });
+        _isTyping = true;
+      });
+
+      _textController.clear();
+      _scrollToBottom();
+
       final resposta = await _genkitService.gerarRespostaComContexto(texto);
       
       setState(() {
@@ -126,7 +149,10 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
       _salvarPerguntaNoFirestore(texto, resposta);
       _scrollToBottom();
 
-    } catch (e) {
+    } catch (e, stack) {
+      print('ERROR IN ENVIAR MENSAGEM: $e');
+      print('STACK TRACE: $stack');
+      
       setState(() {
         _isTyping = false;
         _mensagens.add({
@@ -137,7 +163,6 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
         });
       });
       _scrollToBottom();
-      print('Error in chat: $e');
     }
   }
 
