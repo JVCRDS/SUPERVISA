@@ -1,33 +1,6 @@
 {
-  "flutter": {
-    "platforms": {
-      "android": {
-        "default": {
-          "projectId": "supervisa-7f491",
-          "appId": "1:406470641375:android:d0474a33d334169f8acb6a",
-          "fileOutput": "android/app/google-services.json"
-        }
-      },
-      "dart": {
-        "lib/firebase_options.dart": {
-          "projectId": "supervisa-7f491",
-          "configurations": {
-            "android": "1:406470641375:android:d0474a33d334169f8acb6a",
-            "ios": "1:406470641375:ios:11ad70c70d199dac8acb6a",
-            "web": "1:406470641375:web:3587af7433509e818acb6a"
-          }
-        }
-      }
-    }
-  },
-  "firestore": {
-    "database": "(default)",
-    "location": "southamerica-east1",
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
   "hosting": {
-    "public": "public",
+    "public": "build/web",
     "ignore": [
       "firebase.json",
       "**/.*",
